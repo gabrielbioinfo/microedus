@@ -85,6 +85,18 @@ services:
     networks:
       - microedus
 
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - /postgres:/data/postgres
+    env_file:
+      - .env
+    networks:
+      - microedus
+
 volumes:
   redis_data:
     driver: local
