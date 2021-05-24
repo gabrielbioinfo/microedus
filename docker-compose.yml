@@ -1,32 +1,24 @@
 version: "3"
 
 services:
-#  graphqlapi:
-#    image: nestmicroservices/graphqlapi:${TAG:-latest}
-#    build:
-#      context: ./services/graphqlapi
-#      dockerfile: Dockerfile
-#    environment:
-#      - GRAPHQL_ENV=production
-#      - REDIS_HOST=redis
-#    ports:
-#      - '4200:4200'
-#    depends_on:
-#      - redis
-#      - rabbitmq
 
-#  catalog:
-#    image: nestmicroservices/catalog:${TAG:-latest}
-#    build:
-#      context: ./services/catalog
-#      dockerfile: Dockerfile
-#    environment:
-#      - REDIS_HOST=redis
-#    ports:
-#      - "4201:3000"
-#    depends_on:
-#      - redis
-#      - rabbitmq
+  backend-admin:
+    container_name: backend-admin
+    image: microedus/backend-admin:1.0
+    build:
+      context: ./backend-admin
+      dockerfile: ./Dockerfile
+      target: development
+    command: npm run start:debug
+    ports:
+      - 3000:3000
+      - 9229:9229
+    networks:
+      - microedus
+    volumes:
+      - ./backend-admin:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
 
   rabbitmq:
     image: "rabbitmq:3-management"
@@ -39,6 +31,8 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+    networks:
+      - microedus
 
   redis:
     image: "bitnami/redis:latest"
@@ -52,7 +46,11 @@ services:
       - "6379:6379"
     volumes:
       - "redis_data:/bitnami/redis"
+    networks:
+      - microedus
 
 volumes:
   redis_data:
     driver: local
+networks:
+  microedus:
